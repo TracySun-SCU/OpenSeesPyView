@@ -35,7 +35,7 @@ class OpenSeesPyClass():
         self.EleLocalCoordSysSetNameList=[]
         self.localTransfNameList=[]
         self.materialNumberDict={}
-        self.dbPath = "resultsDB_"+str(self.caseNumber)+str("_")+str(self.waveNumber)+".db"
+        self.dbPath = f"resultsDB_{str(self.caseNumber)}_{str(self.waveNumber)}.db"
         self.saveInstance = SqliteDB(self.dbPath)
         SqliteDB.initDB(self.dbPath)
 
@@ -51,7 +51,7 @@ class OpenSeesPyClass():
             nodeList(list)-eg.[[nodeTag,xCoord,yCoord,ZCoord,nodeMass],[],...]
             tipsString(str)-the string for identifying the nodes set
         """
-        print(tipsString+' constructing start...')
+        print(f'{tipsString} constructing start...')
         saveList=[]
         for each in nodeList:
             nodeTageValue = int(each[0])
@@ -63,9 +63,11 @@ class OpenSeesPyClass():
                  nodeMassValue, 0.0, 0.0, 0.0)
             coords=ops.nodeCoord(nodeTageValue)
             saveList.append([nodeTageValue]+coords)
-        print(tipsString + ' constructing finish...')
-        self.nodeSetNameList.append(tipsString+"_node")
-        self.saveInstance.saveNodes(nodesSaveName=tipsString+"_node",nodeList=saveList)
+        print(f'{tipsString} constructing finish...')
+        self.nodeSetNameList.append(f"{tipsString}_node")
+        self.saveInstance.saveNodes(
+            nodesSaveName=f"{tipsString}_node", nodeList=saveList
+        )
 
     def cable_material(self,cableMateriallist,cableYieldStress=0.0,tipsString=""):
         """
@@ -76,16 +78,16 @@ class OpenSeesPyClass():
             cableYieldStress(float,kpa)-the yield stress for the cable
             tipsString(str)-print information on console
         """
-        print(tipsString + ' constructing start...')
+        print(f'{tipsString} constructing start...')
+        epsyNValue = 0.0
         for each in cableMateriallist:
             cableMatTag = int(each[0])
             cableEValue = float(each[1])
             preStrValue = float(each[2])
-            eps0Value = -preStrValue / float(cableEValue)
-            epsyNValue = 0.0
-            epsyPValue = cableYieldStress/ float(cableEValue) + eps0Value
+            eps0Value = -preStrValue / cableEValue
+            epsyPValue = cableYieldStress / cableEValue + eps0Value
             ops.uniaxialMaterial('ElasticPP', cableMatTag, cableEValue, epsyPValue, epsyNValue, eps0Value)
-        print(tipsString + ' constructing finish...')
+        print(f'{tipsString} constructing finish...')
 
     def ele_truss(self,eleList,tipsString=""):
         """
@@ -95,7 +97,7 @@ class OpenSeesPyClass():
             eleList(list)-eg. [[eleTag,NodeI,nodeJ,Area,matTag],[],...]
             tipsString(str)-print information on console
         """
-        print(tipsString + ' constructing start...')
+        print(f'{tipsString} constructing start...')
         saveList=[]
         for each in eleList:
             EleTag = int(each[0])
@@ -106,9 +108,9 @@ class OpenSeesPyClass():
             ops.element('Truss', EleTag, NodeI, NodeJ, A, MatTag)
             eleNodes = ops.eleNodes(EleTag)
             saveList.append([EleTag] + eleNodes)
-        self.eleSetNameList.append(tipsString+"_ele")
-        self.saveInstance.saveEles(elesSaveName=tipsString+"_ele", elesList=saveList)
-        print(tipsString + ' constructing finish...')
+        self.eleSetNameList.append(f"{tipsString}_ele")
+        self.saveInstance.saveEles(elesSaveName=f"{tipsString}_ele", elesList=saveList)
+        print(f'{tipsString} constructing finish...')
 
     def geomTransf_PDelta(self,geomTransfList,tipsString=""):
         """
@@ -119,7 +121,7 @@ class OpenSeesPyClass():
             geomTransfList(list)-eg.[[TransfTag,localZXCoord,localZYCoord,localZZCoord],[],...]
             tipsString(str)-print information on console
         """
-        print(tipsString + ' constructing start...')
+        print(f'{tipsString} constructing start...')
         saveGeomfList=[]
         for each in geomTransfList:
             TransfTag = int(each[0])
@@ -128,10 +130,12 @@ class OpenSeesPyClass():
             localZZCoord = float(each[3])
             ops.geomTransf('PDelta', TransfTag,localZXCoord,localZYCoord,localZZCoord)
             saveGeomfList.append([TransfTag,localZXCoord,localZYCoord,localZZCoord])
-        self.localTransfNameList.append(tipsString + "_geomTransf")
-        self.saveInstance.saveGeomTransf(geomTransfSaveName=tipsString + "_geomTransf",geomfList=saveGeomfList)
+        self.localTransfNameList.append(f"{tipsString}_geomTransf")
+        self.saveInstance.saveGeomTransf(
+            geomTransfSaveName=f"{tipsString}_geomTransf", geomfList=saveGeomfList
+        )
 
-        print(tipsString + ' constructing finish...')
+        print(f'{tipsString} constructing finish...')
 
     def ele_elasticBeamColum(self,eleList,tipsString=""):
         """
@@ -141,7 +145,7 @@ class OpenSeesPyClass():
             eleList(list)-eg.[[eleTag,nodeI,nodeJ,A,E,G,J,Iy,Iz,Transf],[],...]
             tipsString(str)-print information on console
         """
-        print(tipsString + ' constructing start...')
+        print(f'{tipsString} constructing start...')
         saveList=[]
         EleLocalCoordSys=[]
         for each in eleList:
@@ -159,12 +163,15 @@ class OpenSeesPyClass():
             eleNodes = ops.eleNodes(EleTag)
             saveList.append([EleTag] + eleNodes)
             EleLocalCoordSys.append(['realEle',NodeI,NodeJ,Transf])
-        self.eleSetNameList.append(tipsString+"_ele")
-        self.EleLocalCoordSysSetNameList.append(tipsString+"_eleLocCordSys")
-        self.saveInstance.saveEles(elesSaveName=tipsString+"_ele", elesList=saveList)
-        self.saveInstance.saveEleLocalCoordSys(SaveName=tipsString+"_eleLocCordSys",EleLocalCoordSys=EleLocalCoordSys)
+        self.eleSetNameList.append(f"{tipsString}_ele")
+        self.EleLocalCoordSysSetNameList.append(f"{tipsString}_eleLocCordSys")
+        self.saveInstance.saveEles(elesSaveName=f"{tipsString}_ele", elesList=saveList)
+        self.saveInstance.saveEleLocalCoordSys(
+            SaveName=f"{tipsString}_eleLocCordSys",
+            EleLocalCoordSys=EleLocalCoordSys,
+        )
 
-        print(tipsString + ' constructing finish...')
+        print(f'{tipsString} constructing finish...')
 
     def materialReNumber(self,materialName):
         """
@@ -188,11 +195,11 @@ class OpenSeesPyClass():
             GJValue-(float)-linear-elastic torsional stiffness assigned to the section (default value takes 1.0e10)
             tipsString(str)-print information on console
         """
-        print(tipsString + ' constructing start...')
+        print(f'{tipsString} constructing start...')
         ops.section('Fiber', int(eleTag), '-GJ', GJValue)
         [ops.fiber(eachItem[0], eachItem[1], eachItem[2], matTagList[i1])
          for i1 in range(len(fiberList)) for eachItem in fiberList[i1]]
-        print(tipsString + ' constructing finish...')
+        print(f'{tipsString} constructing finish...')
 
     def ele_nonlinearBeamColumn(self,nonlinearEleList,integrationPoint=5,tipsString=''):
         """
@@ -203,7 +210,7 @@ class OpenSeesPyClass():
             integrationPoint(int)-number of integration points.
             tipsString(str)-print information on console
         """
-        print(tipsString + ' constructing start...')
+        print(f'{tipsString} constructing start...')
         self.intePointNum=integrationPoint
         saveList=[]
         EleLocalCoordSys = []
@@ -218,12 +225,14 @@ class OpenSeesPyClass():
             eleNodes = ops.eleNodes(EleTag)
             saveList.append([EleTag] + eleNodes)
             EleLocalCoordSys.append(['realEle', EleNodeI,EleNodeJ, EleGeomTransf])
-        self.eleSetNameList.append(tipsString+"_ele")
-        self.saveInstance.saveEles(elesSaveName=tipsString+"_ele", elesList=saveList)
-        self.EleLocalCoordSysSetNameList.append(tipsString + "_eleLocCordSys")
-        self.saveInstance.saveEleLocalCoordSys(SaveName=tipsString + "_eleLocCordSys",
-                                               EleLocalCoordSys=EleLocalCoordSys)
-        print(tipsString + ' constructing finish...')
+        self.eleSetNameList.append(f"{tipsString}_ele")
+        self.saveInstance.saveEles(elesSaveName=f"{tipsString}_ele", elesList=saveList)
+        self.EleLocalCoordSysSetNameList.append(f"{tipsString}_eleLocCordSys")
+        self.saveInstance.saveEleLocalCoordSys(
+            SaveName=f"{tipsString}_eleLocCordSys",
+            EleLocalCoordSys=EleLocalCoordSys,
+        )
+        print(f'{tipsString} constructing finish...')
 
     def fix_complete(self,fixList,tipsString=''):
         """
@@ -233,10 +242,10 @@ class OpenSeesPyClass():
             fixList(list)-eg.[nodeTag1,nodeTag2,...]
 
         """
-        print(tipsString + ' constructing start...')
+        print(f'{tipsString} constructing start...')
         for each in fixList:
             ops.fix(int(each), 1, 1, 1, 1, 1, 1)
-        print(tipsString + ' constructing finish...')
+        print(f'{tipsString} constructing finish...')
 
     def gravity_load(self,nodesList,tipsString=""):
         """
@@ -244,12 +253,12 @@ class OpenSeesPyClass():
         ------------------------------------------
         nodesList(list)-eg.[[[node1Tag,node1Mass],[],...],[],...]
         """
-        print(tipsString + ' constructing start...')
+        print(f'{tipsString} constructing start...')
         ops.timeSeries('Linear', 1)
         ops.pattern('Plain', 1, 1)
         for each in nodesList:
             ops.load(int(each[0]), 0.0, 0.0, -each[1] * 9.81, 0.0, 0.0, 0.0)
-        print(tipsString + ' constructing finish...')
+        print(f'{tipsString} constructing finish...')
 
     def analysis_gravity(self,tipsString='',recordList=None):
         """

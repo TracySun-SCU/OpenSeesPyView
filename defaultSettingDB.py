@@ -22,15 +22,15 @@ class DefaultSet(object):
 
     def initDB(self):
         """Initialize the database"""
-        self.db = records.Database('sqlite:///'+self._dbPath)
+        self.db = records.Database(f'sqlite:///{self._dbPath}')
         tableNames=self.db.get_table_names()
         for each in tableNames:
-            self.db.query("DROP TABLE IF EXISTS "+each)
+            self.db.query(f"DROP TABLE IF EXISTS {each}")
 
     @classmethod
     def upDateValue(cls,tableName,tagName,tagValue):
         """Property values saving"""
-        db = records.Database('sqlite:///'+cls.dbPath)
+        db = records.Database(f'sqlite:///{cls.dbPath}')
         sql_create_table = f"""
                         CREATE TABLE IF NOT EXISTS
                         {tableName}(
@@ -51,14 +51,13 @@ class DefaultSet(object):
     @classmethod
     def getValue(cls,tableName,tagName):
         """Inquire"""
-        db = records.Database('sqlite:///' + cls.dbPath)
+        db = records.Database(f'sqlite:///{cls.dbPath}')
         conn = db.get_connection()
         try:
             rows = conn.query(f"""SELECT *FROM {tableName} """)
-            saveValue = rows.all(as_dict=True)[0][tagName]
-            return saveValue
+            return rows.all(as_dict=True)[0][tagName]
         except:
-            print(tableName + ' or ' + tagName + ' not exist in the dataBase!')
+            print(f'{tableName} or {tagName} not exist in the dataBase!')
             if tableName=="backGroundColorTable":
                 saveValue="#000000"
             else:
@@ -66,7 +65,7 @@ class DefaultSet(object):
                                  "#ffaa00","#55aa7f", "#ff00ff", "#ffaaff"]
                 saveValue=random.choice(initColorList)
 
-                db = records.Database('sqlite:///' + cls.dbPath)
+                db = records.Database(f'sqlite:///{cls.dbPath}')
                 sql_create_table = f"""
                                         CREATE TABLE IF NOT EXISTS
                                         {tableName}(
