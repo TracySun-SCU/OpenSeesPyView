@@ -24,12 +24,12 @@ class SqliteDB(object):
         self._dbPath = dbPath
 
     @classmethod
-    def initDB(self,dbPath):
+    def initDB(cls, dbPath):
         """Initialize the database"""
-        self.db = records.Database('sqlite:///' + dbPath)
-        tableNames=self.db.get_table_names()
+        cls.db = records.Database(f'sqlite:///{dbPath}')
+        tableNames = cls.db.get_table_names()
         for each in tableNames:
-            self.db.query("DROP TABLE IF EXISTS " + each)
+            cls.db.query(f"DROP TABLE IF EXISTS {each}")
         import sqlite3
         con = sqlite3.connect(dbPath)
         con.execute("VACUUM")
@@ -38,7 +38,7 @@ class SqliteDB(object):
 
     def saveNodes(self,nodesSaveName,nodeList):
         """Save nodes to database, [[nodeTag,xCoord,yCoord,zCoord...],[],...]"""
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         nodesDict=[{'tags':int(each[0]),'contents':str(each[1:])} for each in nodeList]
         nodesTable = f"""
                         CREATE TABLE IF NOT EXISTS
@@ -51,7 +51,7 @@ class SqliteDB(object):
                         {nodesSaveName}(tags,contents)
                         values (:tags,:contents) """
         db.bulk_query(insertNodes, nodesDict)
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         db.close()
 
     def getNodes(self,saveNodeName):
@@ -59,19 +59,18 @@ class SqliteDB(object):
         return nodes from database
         saveNodeName(str)-the table name of saved nodes
         """
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         conn = db.get_connection()
         try:
             queryValue = conn.query(f'''select * from {saveNodeName};''')
-            returnValue = queryValue.all(as_dict=True)
-            return returnValue
+            return queryValue.all(as_dict=True)
         except:
             print(f'''table {saveNodeName} doesn't exitst!''')
             return
 
     def saveEles(self,elesSaveName,elesList):
         """Save nodes to database, [[eleTag,nodeI,nodeJ,...],[],...]"""
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         elesDict=[{'tags':int(each[0]),'contents':str(each[1:])} for each in elesList]
         nodesTable = f"""
                         CREATE TABLE IF NOT EXISTS
@@ -84,7 +83,7 @@ class SqliteDB(object):
                         {elesSaveName}(tags,contents)
                         values (:tags,:contents) """
         db.bulk_query(insertNodes,elesDict)
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         db.close()
 
     def getEles(self,saveElesName):
@@ -92,19 +91,18 @@ class SqliteDB(object):
         return elements from database
         saveElesName(str)-the table name of saved eles
         """
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         conn = db.get_connection()
         try:
             queryValue = conn.query(f'''select * from {saveElesName};''')
-            returnValue = queryValue.all(as_dict=True)
-            return returnValue
+            return queryValue.all(as_dict=True)
         except:
             print(f'''table {saveNodeName} doesn't exitst!''')
             return
 
     def saveModes(self,modesName,modesList):
         """Save modes to database, [[nodeTag,[mode1value,mode2value],...],[],...]"""
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         nodesDict = [{'tags': int(each[0]), 'contents': str(each[1:])} for each in modesList]
         nodesTable = f"""
                                 CREATE TABLE IF NOT EXISTS
@@ -117,53 +115,51 @@ class SqliteDB(object):
                                 {modesName}(tags,contents)
                                 values (:tags,:contents) """
         db.bulk_query(insertNodes, nodesDict)
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         db.close()
 
     def getModes(self,saveModesName):
         """
         return modes from database
         """
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         conn = db.get_connection()
         try:
             queryValue = conn.query(f'''select * from {saveModesName};''')
-            returnValue = queryValue.all(as_dict=True)
-            return returnValue
+            return queryValue.all(as_dict=True)
         except:
             print(f'''table {saveModesName} doesn't exitst!''')
             return
 
     def savePeriod(self,periodList):
         """Save periods to database, [[periodNum,value],[],...]"""
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         periodDict = [{'tags': int(each[0]), 'contents': str(each[1:])} for each in periodList]
-        periodTable = f"""
+        periodTable = """
                                         CREATE TABLE IF NOT EXISTS
                                         periods(
                                         tags INT NOT NULL,
                                         contents MESSAGE_TEXT NOT NULL);"""
         db.query(periodTable)
-        insertPeriods = f"""
+        insertPeriods = """
                                         INSERT INTO
                                         periods(tags,contents)
                                         values (:tags,:contents) """
         db.bulk_query(insertPeriods, periodDict)
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         db.close()
 
     def getPeriod(self):
         """
         return periods from database
         """
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         conn = db.get_connection()
         try:
-            queryValue = conn.query(f'''select * from periods;''')
-            returnValue = queryValue.all(as_dict=True)
-            return returnValue
+            queryValue = conn.query('''select * from periods;''')
+            return queryValue.all(as_dict=True)
         except:
-            print(f'''table periods doesn't exitst!''')
+            print('''table periods doesn't exitst!''')
             return
 
     def saveGeomTransf(self,geomTransfSaveName,geomfList):
@@ -172,7 +168,7 @@ class SqliteDB(object):
         geomTransfSaveName(str)-the name of the saved table
         geomfList(list)-[[geomfTag1,localZX_1,localZY_1,localZZ_1],[geomfTag2,localZX_2,localZY_2,localZZ_2],...]
         """
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         geomfDict = [{'tags': int(each[0]), 'contents': str(each[1:])} for each in geomfList]
         geomfTable = f"""
                                 CREATE TABLE IF NOT EXISTS
@@ -185,7 +181,7 @@ class SqliteDB(object):
                                 {geomTransfSaveName}(tags,contents)
                                 values (:tags,:contents) """
         db.bulk_query(insertGeomf, geomfDict)
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         db.close()
 
     def getGeomTransf(self, saveGeomTransfName):
@@ -193,12 +189,11 @@ class SqliteDB(object):
         return geomTransf from database
         saveGeomTransfName(str)-the table name of saved geomTransf
         """
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         conn = db.get_connection()
         try:
             queryValue = conn.query(f'''select * from {saveGeomTransfName};''')
-            returnValue = queryValue.all(as_dict=True)
-            return returnValue
+            return queryValue.all(as_dict=True)
         except:
             print(f'''table {saveGeomTransfName} doesn't exitst!''')
             return
@@ -211,7 +206,7 @@ class SqliteDB(object):
                         -for zeroLength ele or node, [['specialEle',nodeI,nodeJ,(localX_x,localX_y,localX_z),
                         (localY_x,localY_y,localY_z)]]
         """
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         geomfDict = [{'tags': str(each[0]), 'contents': str(each[1:])} for each in EleLocalCoordSys]
         geomfTable = f"""
                                         CREATE TABLE IF NOT EXISTS
@@ -224,7 +219,7 @@ class SqliteDB(object):
                                         {SaveName}(tags,contents)
                                         values (:tags,:contents) """
         db.bulk_query(insertGeomf, geomfDict)
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         db.close()
 
     def getEleLocalCoordSys(self, saveEleLocalCoordSysName):
@@ -232,12 +227,11 @@ class SqliteDB(object):
         return EleLocalCoordSys from database
         saveEleLocalCoordSysName(str)-the table name of saved EleLocalCoordSysName
         """
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         conn = db.get_connection()
         try:
             queryValue = conn.query(f'''select * from {saveEleLocalCoordSysName};''')
-            returnValue = queryValue.all(as_dict=True)
-            return returnValue
+            return queryValue.all(as_dict=True)
         except:
             print(f'''table {saveEleLocalCoordSysName} doesn't exitst!''')
             return
@@ -264,7 +258,7 @@ class SqliteDB(object):
                         {nodeSaveName}(times,dof_1,dof_2,dof_3)
                         values (:times,:dof_1,:dof_2,:dof_3) """
         self.db.bulk_query(insertNodes,nodeResponseDict)
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         db.close()
 
 
@@ -278,15 +272,15 @@ class SqliteDB(object):
         Outputs:
             historyResList(list),[times0,times1,times2,...],[response0,response1,response2,...]
         """
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         conn = db.get_connection()
-        tableName='node_'+resType+'_'+str(nodeTag)
+        tableName = f'node_{resType}_{str(nodeTag)}'
         dofDict={1:'dof_1',2:'dof_2',3:'dof_3'}
         try:
             queryValue = conn.query(f'''select times,{dofDict[dof]} from {tableName};''')
             returnValue = queryValue.all(as_dict=True)
         except:
-            print(f'''Something is wrong. Please check the parameters!''')
+            print('''Something is wrong. Please check the parameters!''')
             return
         timesList=[]
         responseList=[]
@@ -312,7 +306,7 @@ class SqliteDB(object):
                                 {eleSaveName}(times,resValue)
                                 values (:times,:resValue) """
         self.db.bulk_query(insertNodes,eleResponseDict)
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         db.close()
 
     def getTrussEleResponseTimeHistory(self,eleTag,resType):
@@ -325,15 +319,15 @@ class SqliteDB(object):
             timesList,responsesList
 
         """
-        tableName='trussEle_'+resType+'_'+str(eleTag)
-        db = records.Database('sqlite:///' + self._dbPath)
+        tableName = f'trussEle_{resType}_{str(eleTag)}'
+        db = records.Database(f'sqlite:///{self._dbPath}')
         conn = db.get_connection()
-        tableName = 'trussEle_' + resType + '_' + str(eleTag)
+        tableName = f'trussEle_{resType}_{str(eleTag)}'
         try:
             queryValue = conn.query(f'''select times,resValue from {tableName};''')
             returnValue = queryValue.all(as_dict=True)
         except:
-            print(f'''Something is wrong. Please check the parameters!''')
+            print('''Something is wrong. Please check the parameters!''')
             return
         timesList = []
         responseList = []
@@ -353,7 +347,7 @@ class SqliteDB(object):
         linkstr += f"'dof_{directions[-1]}':float(each[1][-1])}} for each in {eleHistoryList}]"
         eleResponseDict =eval(linkstr)
 
-        linkstrTable=f"""
+        linkstrTable = """
                         times REAL NOT NULL,
                       """
         for iTable in range(len(directions) - 1):
@@ -364,11 +358,11 @@ class SqliteDB(object):
                                         CREATE TABLE IF NOT EXISTS
                                         {eleSaveName}({linkstrTable});"""
         self.db.query(nodesTable)
-        repreLinkStr=f"""times,"""
+        repreLinkStr = """times,"""
         for iTable in range(len(directions) - 1):
             repreLinkStr+=f"""dof_{directions[iTable]},"""
         repreLinkStr+=f"""dof_{directions[-1]}"""
-        realLinkStr=f""":times,"""
+        realLinkStr = """:times,"""
         for iTable in range(len(directions) - 1):
             realLinkStr+=f""":dof_{directions[iTable]},"""
         realLinkStr += f""":dof_{directions[-1]}"""
@@ -377,7 +371,7 @@ class SqliteDB(object):
                     {eleSaveName}({repreLinkStr})
                     values ({realLinkStr}) """
         self.db.bulk_query(insertNodes, eleResponseDict)
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         db.close()
 
     def getZeroEleResponseTimeHistory(self,eleTag,resType,dof):
@@ -390,15 +384,15 @@ class SqliteDB(object):
         Outputs:
             timesList,responsesList
         """
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         conn = db.get_connection()
-        tableName = 'zeroEle_' + resType + '_' + str(eleTag)
+        tableName = f'zeroEle_{resType}_{str(eleTag)}'
         dofDict = {1: 'dof_1', 2: 'dof_2', 3: 'dof_3', 4: 'dof_4', 5: 'dof_5', 6: 'dof_6'}
         try:
             queryValue = conn.query(f'''select times,{dofDict[dof]} from {tableName};''')
             returnValue = queryValue.all(as_dict=True)
         except:
-            print(f'''Something is wrong. Please check the parameters!''')
+            print('''Something is wrong. Please check the parameters!''')
             return
         timesList = []
         responseList = []
@@ -427,7 +421,7 @@ class SqliteDB(object):
                         {eleSaveName}(times,dof_1,dof_2,dof_3,dof_4)
                         values (:times,:dof_1,:dof_2,:dof_3,:dof_4) """
         self.db.bulk_query(insertNodes, eleResponseDict)
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         db.close()
 
     def getNonEleSectResponseTimeHistory(self,eleTag,resType,dof):
@@ -441,15 +435,15 @@ class SqliteDB(object):
         Outputs:
             timesList,responsesList
         """
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         conn = db.get_connection()
-        tableName = 'nonEle_' + resType + '_' + str(eleTag)
+        tableName = f'nonEle_{resType}_{str(eleTag)}'
         dofDict = {1: 'dof_1', 2: 'dof_2', 3: 'dof_3', 4: 'dof_4'}
         try:
             queryValue = conn.query(f'''select times,{dofDict[dof]} from {tableName};''')
             returnValue = queryValue.all(as_dict=True)
         except:
-            print(f'''Something is wrong. Please check the parameters!''')
+            print('''Something is wrong. Please check the parameters!''')
             return
         timesList = []
         responseList = []
@@ -491,7 +485,7 @@ class SqliteDB(object):
                                 values (:times,:dofI_1,:dofI_2,:dofI_3,:dofI_4,:dofI_5,:dofI_6,
                                 :dofJ_1,:dofJ_2,:dofJ_3,:dofJ_4,:dofJ_5,:dofJ_6) """
         self.db.bulk_query(insertNodes, eleResponseDict)
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         db.close()
 
     def getNonZeroEleResponseTimeHistory(self,eleTag,resType,eleEnd,dof):
@@ -505,17 +499,17 @@ class SqliteDB(object):
         Outputs:
             timesList,responsesList
         """
-        db = records.Database('sqlite:///' + self._dbPath)
+        db = records.Database(f'sqlite:///{self._dbPath}')
         conn = db.get_connection()
-        tableName = 'nonZeroEle_' + resType + '_' + str(eleTag)
-        inqTag=eleEnd+'_'+str(dof)
+        tableName = f'nonZeroEle_{resType}_{str(eleTag)}'
+        inqTag = f'{eleEnd}_{str(dof)}'
         dofDict = {'I_1': 'dofI_1','I_2': 'dofI_2','I_3': 'dofI_3','I_4': 'dofI_4','I_5': 'dofI_5','I_6': 'dofI_6',
                    'J_1': 'dofJ_1','J_2': 'dofJ_2','J_3': 'dofJ_3','J_4': 'dofJ_4','J_5': 'dofJ_5','J_6': 'dofJ_6'}
         try:
             queryValue = conn.query(f'''select times,{dofDict[inqTag]} from {tableName};''')
             returnValue = queryValue.all(as_dict=True)
         except:
-            print(f'''Something is wrong. Please check the parameters!''')
+            print('''Something is wrong. Please check the parameters!''')
             return
         timesList = []
         responseList = []

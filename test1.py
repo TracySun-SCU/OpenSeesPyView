@@ -16,8 +16,7 @@ def test():
     )
 
     ref = 3.1363871677682247
-    mesh = pygmsh.generate_mesh(geom, prune_z_0=True)
-    return mesh
+    return pygmsh.generate_mesh(geom, prune_z_0=True)
 
 
 if __name__ == "__main__":

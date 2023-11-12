@@ -57,9 +57,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def ui(self):
         """---basic panel setting---"""
         self.setWindowTitle("OpenSeesPyView")
-        self.setWindowIcon(QIcon(self.resourcePath+"/figures/OpenSeesPyView.ico"))
+        self.setWindowIcon(QIcon(f"{self.resourcePath}/figures/OpenSeesPyView.ico"))
         self.setGeometry(int(0.05 * self.screenSize[0]), int(0.1 * self.screenSize[1]), \
-                         int(0.9 * self.screenSize[0]), int(0.8 * self.screenSize[1]))
+                             int(0.9 * self.screenSize[0]), int(0.8 * self.screenSize[1]))
         self.frame = QFrame()  # generate frame
         vlayout = QVBoxLayout()
         self.plotter = QtInteractor(self.frame)  # add pyvista interactor
@@ -246,37 +246,39 @@ class MainWindow(QtWidgets.QMainWindow):
         """---elements color setting---"""
         color = QColorDialog.getColor()
         if color.isValid():
-            DefaultSet.upDateValue(tableName=elesName + "Table",
-                                   tagName=elesName + "Color", tagValue=color.name())
+            DefaultSet.upDateValue(
+                tableName=f"{elesName}Table",
+                tagName=f"{elesName}Color",
+                tagValue=color.name(),
+            )
             self.elesBarSlot()
 
     def _dataBaseProcess(self,dbPath):
         """process the result database"""
         self.sqliteDBInstance = SqliteDB(dbPath)
-        db = records.Database('sqlite:///' + dbPath)
+        db = records.Database(f'sqlite:///{dbPath}')
         tableNames = db.get_table_names()
         modalNameList=[]
         for each in tableNames:
             if each=='periods':
                 continue
-            else:
-                splitList=each.rsplit('_')
-                if splitList[1]=='node':
-                    self.nodeNameList.append(each)
-                elif splitList[1]=='ele':
-                    self.eleNameList.append(each)
-                elif splitList[1]=='mode':
-                    modalNameList.append(splitList)
-                elif splitList[1]=='geomTransf':
-                    self.geomTransfNameList.append(each)
-                elif splitList[1]=='eleLocCordSys':
-                    self.eleLocalCoordSysNameList.append(each)
-        modalName=modalNameList[0][0]+'_'+modalNameList[0][1]
+            splitList=each.rsplit('_')
+            if splitList[1]=='node':
+                self.nodeNameList.append(each)
+            elif splitList[1]=='ele':
+                self.eleNameList.append(each)
+            elif splitList[1]=='mode':
+                modalNameList.append(splitList)
+            elif splitList[1]=='geomTransf':
+                self.geomTransfNameList.append(each)
+            elif splitList[1]=='eleLocCordSys':
+                self.eleLocalCoordSysNameList.append(each)
+        modalName = f'{modalNameList[0][0]}_{modalNameList[0][1]}'
         self.modalNameList.append(modalName)
 
     def nodeBar(self, mainToolBar):
         """---model nodes tool set---"""
-        nodeAct = QAction(QIcon(self.resourcePath+"/figures/node.png"), "node", self)
+        nodeAct = QAction(QIcon(f"{self.resourcePath}/figures/node.png"), "node", self)
         mainToolBar.addAction(nodeAct)
         nodeAct.triggered.connect(self.nodeBarSlot)
 
@@ -287,7 +289,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def nodeTagBar(self, mainToolBar):
         """---model nodes and tags set---"""
-        nodeTagAct = QAction(QIcon(self.resourcePath+"/figures/nodeTag.png"), "nodeTag", self)
+        nodeTagAct = QAction(
+            QIcon(f"{self.resourcePath}/figures/nodeTag.png"), "nodeTag", self
+        )
         mainToolBar.addAction(nodeTagAct)
         nodeTagAct.triggered.connect(self.nodeTagBarSlot)
 
@@ -298,7 +302,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def eleBar(self, mainToolBar):
         """---model elements set---"""
-        elesAct = QAction(QIcon(self.resourcePath+"/figures/element.png"), "elements", self)
+        elesAct = QAction(
+            QIcon(f"{self.resourcePath}/figures/element.png"), "elements", self
+        )
         mainToolBar.addAction(elesAct)
         elesAct.triggered.connect(self.elesBarSlot)
 
@@ -309,7 +315,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def eleNodeBar(self, mainToolBar):
         """---model elements and nodes set---"""
-        eleNodeAct = QAction(QIcon(self.resourcePath+"/figures/eleNodes.png"), "elements and nodes", self)
+        eleNodeAct = QAction(
+            QIcon(f"{self.resourcePath}/figures/eleNodes.png"),
+            "elements and nodes",
+            self,
+        )
         mainToolBar.addAction(eleNodeAct)
         eleNodeAct.triggered.connect(self.eleNodeBarSlot)
 
@@ -320,7 +330,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def eleNodeTagBar(self, mainToolBar):
         """---model elments ,nodes and tags set---"""
-        eleNodeTagAct = QAction(QIcon(self.resourcePath+"/figures/nodeEleTag.png"), "elements,nodes and tags", self)
+        eleNodeTagAct = QAction(
+            QIcon(f"{self.resourcePath}/figures/nodeEleTag.png"),
+            "elements,nodes and tags",
+            self,
+        )
         mainToolBar.addAction(eleNodeTagAct)
         eleNodeTagAct.triggered.connect(self.eleNodeTagBarSlot)
 
@@ -331,7 +345,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def localZBar(self,mainToolBar):
         """---local coordinate system of each element set---"""
-        localZAct = QAction(QIcon(self.resourcePath + "/figures/eleLocalZTag.png"), "element local coordinate system", self)
+        localZAct = QAction(
+            QIcon(f"{self.resourcePath}/figures/eleLocalZTag.png"),
+            "element local coordinate system",
+            self,
+        )
         mainToolBar.addAction(localZAct)
         localZAct.triggered.connect(self.localZBarSlot)
 
@@ -343,7 +361,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def initBar(self, mainToolBar):
         """---reset view to default---"""
-        initAct = QAction(QIcon(self.resourcePath+"/figures/init.png"), "default view", self)
+        initAct = QAction(
+            QIcon(f"{self.resourcePath}/figures/init.png"), "default view", self
+        )
         mainToolBar.addAction(initAct)
         initAct.triggered.connect(self.initBarSlot)
 
@@ -353,7 +373,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def threeDimBar(self, mainToolBar):
         """---3D view set---"""
-        threeDimAct = QAction(QIcon(self.resourcePath+"/figures/threeDim.png"), "three dimensional view", self)
+        threeDimAct = QAction(
+            QIcon(f"{self.resourcePath}/figures/threeDim.png"),
+            "three dimensional view",
+            self,
+        )
         mainToolBar.addAction(threeDimAct)
         threeDimAct.triggered.connect(self.threeDimBarSlot)
 
@@ -363,7 +387,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def xyViewBar(self, mainToolBar):
         """---xy view set---"""
-        xyViewAct = QAction(QIcon(self.resourcePath+"/figures/XYView.png"), "XY view", self)
+        xyViewAct = QAction(
+            QIcon(f"{self.resourcePath}/figures/XYView.png"), "XY view", self
+        )
         mainToolBar.addAction(xyViewAct)
         xyViewAct.triggered.connect(self.xyViewBarSlot)
 
@@ -373,7 +399,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def xzViewBar(self, mainToolBar):
         """---xz view set---"""
-        xzViewAct = QAction(QIcon(self.resourcePath+"/figures/XZView.png"), "XZ view", self)
+        xzViewAct = QAction(
+            QIcon(f"{self.resourcePath}/figures/XZView.png"), "XZ view", self
+        )
         mainToolBar.addAction(xzViewAct)
         xzViewAct.triggered.connect(self.xzViewBarSlot)
 
@@ -383,7 +411,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def yzViewBar(self, mainToolBar):
         """---yz view set---"""
-        yzViewAct = QAction(QIcon(self.resourcePath+"/figures/YZView.png"), "YZ view", self)
+        yzViewAct = QAction(
+            QIcon(f"{self.resourcePath}/figures/YZView.png"), "YZ view", self
+        )
         mainToolBar.addAction(yzViewAct)
         yzViewAct.triggered.connect(self.yzViewBarSlot)
 
@@ -507,7 +537,7 @@ class MainWindow(QtWidgets.QMainWindow):
             [msp.add_line(nodesDict[nodeIJ[0]],nodesDict[nodeIJ[1]],dxfattribs={"color":colorList[colorIndex]},)
              for nodeIJ in eleNodes]
             colorIndex=colorIndex%len(colorList)
-        doc.saveas(saveFolder+"/modelPlot.dxf")
+        doc.saveas(f"{saveFolder}/modelPlot.dxf")
 
     def exportModeShapeButtonBar(self,mainToolBar):
         """Add a button"""
@@ -527,7 +557,9 @@ class MainWindow(QtWidgets.QMainWindow):
         cadVersion = self.cadVersionDict[cadRelease]
         doc = ezdxf.new(cadVersion)
         msp = doc.modelspace()
-        getModes = self.sqliteDBInstance.getModes(self.modalNameList[0] + '_' + str(modelNum))
+        getModes = self.sqliteDBInstance.getModes(
+            f'{self.modalNameList[0]}_{modelNum}'
+        )
         modesDict = {each['tags']: eval(each['contents']) for each in getModes}
         nodesReturnList = []
         for nodeName in self.nodeNameList:
@@ -545,7 +577,7 @@ class MainWindow(QtWidgets.QMainWindow):
             [msp.add_line(nodesDict[nodeIJ[0]], nodesDict[nodeIJ[1]], dxfattribs={"color": 1,},) for nodeIJ in eleNodes]
             [msp.add_line(updatedNodesDict[nodeIJ[0]], updatedNodesDict[nodeIJ[1]], dxfattribs={"color":3, }, )
              for nodeIJ in eleNodes]
-        doc.saveas(saveFolder+"/modeShape_"+str(modelNum)+".dxf")
+        doc.saveas(f"{saveFolder}/modeShape_{modelNum}.dxf")
 ########################################################################################################################
 ########################################################################################################################
 class pyvistaPlotClass():
@@ -600,8 +632,7 @@ class pyvistaPlotClass():
     @classmethod
     def linkDict(cls, nodesList):
         """---establish sequense dict {23:0,1:1,24:2,...}---"""
-        returnDict = {nodesList[each]['tags']: each for each in range(len(nodesList))}
-        return returnDict
+        return {nodesList[each]['tags']: each for each in range(len(nodesList))}
 
     def elesPlot(self,nodeNameList,sqliteDBInstance,eleNameList):
         """---model element plot---"""
@@ -614,7 +645,9 @@ class pyvistaPlotClass():
         vertices = np.array(verticesNodes)
         nodeMesh = pv.PolyData(vertices)
         for eachEleName in eleNameList:
-            eleColor=DefaultSet.getValue(tableName=eachEleName+"Table",tagName=eachEleName+"Color")
+            eleColor = DefaultSet.getValue(
+                tableName=f"{eachEleName}Table", tagName=f"{eachEleName}Color"
+            )
             getEles = sqliteDBInstance.getEles(eachEleName)
             elesNodes=[eval(each['contents']) for each in getEles]
             elesMesh = [[len(each)] + list(map(lambda item: nodesDict[item], each))  for each in elesNodes]
@@ -639,7 +672,9 @@ class pyvistaPlotClass():
         nodeColor = DefaultSet.getValue(tableName="nodeColorTable", tagName="nodeColor")
         self.plotter.add_mesh(nodeMesh, color=nodeColor, point_size=self.pointSize, render_points_as_spheres=True)
         for eachEleName in eleNameList:
-            eleColor=DefaultSet.getValue(tableName=eachEleName+"Table",tagName=eachEleName+"Color")
+            eleColor = DefaultSet.getValue(
+                tableName=f"{eachEleName}Table", tagName=f"{eachEleName}Color"
+            )
             getEles = sqliteDBInstance.getEles(eachEleName)
             elesNodes=[eval(each['contents']) for each in getEles]
             elesMesh = [[len(each)] + list(map(lambda item: nodesDict[item], each))  for each in elesNodes]
@@ -687,7 +722,9 @@ class pyvistaPlotClass():
                                       shape=None,tolerance=1.0)
         eleNodeTagColor = DefaultSet.getValue(tableName="eleTagColorTable", tagName="eleTagColor")
         for eachEleName in eleNameList:
-            eleColor=DefaultSet.getValue(tableName=eachEleName+"Table",tagName=eachEleName+"Color")
+            eleColor = DefaultSet.getValue(
+                tableName=f"{eachEleName}Table", tagName=f"{eachEleName}Color"
+            )
             getEles = sqliteDBInstance.getEles(eachEleName)
             eles=[[each['tags']]+eval(each['contents']) for each in getEles]
             elesNodes = [eval(each['contents']) for each in getEles]
@@ -722,7 +759,9 @@ class pyvistaPlotClass():
         self.plotter.add_mesh(surf, color=nodeColor, point_size=self.pointSize, render_points_as_spheres=True)
 
         for eachEleName in eleNameList:
-            eleColor=DefaultSet.getValue(tableName=eachEleName+"Table",tagName=eachEleName+"Color")
+            eleColor = DefaultSet.getValue(
+                tableName=f"{eachEleName}Table", tagName=f"{eachEleName}Color"
+            )
             getEles = sqliteDBInstance.getEles(eachEleName)
             eles=[[each['tags']]+eval(each['contents']) for each in getEles]
             elesNodes = [eval(each['contents']) for each in getEles]
@@ -764,10 +803,24 @@ class pyvistaPlotClass():
         localYList=[]
         localZList=[]
         for each in realLengthEleArrowList:
-            localYList.append(list(each[0]))
-            localYList.append(list(np.array(each[0])+np.array(each[2])/float(np.linalg.norm(each[2]))))
-            localZList.append(list(each[0]))
-            localZList.append(list(np.array(each[0])+np.array(each[3])/float(np.linalg.norm(each[3]))))
+            localYList.extend(
+                (
+                    list(each[0]),
+                    list(
+                        np.array(each[0])
+                        + np.array(each[2]) / float(np.linalg.norm(each[2]))
+                    ),
+                )
+            )
+            localZList.extend(
+                (
+                    list(each[0]),
+                    list(
+                        np.array(each[0])
+                        + np.array(each[3]) / float(np.linalg.norm(each[3]))
+                    ),
+                )
+            )
         vertices = np.array(localYList)
         elesMesh = [[2, int(2 * i1), int(2 * i1 + 1)] for i1 in range(int(0.5 * len(vertices)))]
         elesFaces = np.hstack(elesMesh)
@@ -784,13 +837,33 @@ class pyvistaPlotClass():
         localYList = []
         localZList = []
         for each in specialEleArrowList:
-            localXList.append(list(each[0]))
-            localXList.append(list(np.array(each[0]) + np.array(each[1]) / float(np.linalg.norm(each[1]))))
-            localYList.append(list(each[0]))
-            localYList.append(list(np.array(each[0]) + np.array(each[2]) / float(np.linalg.norm(each[2]))))
-            localZList.append(list(each[0]))
-            localZList.append(list(np.array(each[0]) + np.array(each[3]) / float(np.linalg.norm(each[3]))))
-
+            localXList.extend(
+                (
+                    list(each[0]),
+                    list(
+                        np.array(each[0])
+                        + np.array(each[1]) / float(np.linalg.norm(each[1]))
+                    ),
+                )
+            )
+            localYList.extend(
+                (
+                    list(each[0]),
+                    list(
+                        np.array(each[0])
+                        + np.array(each[2]) / float(np.linalg.norm(each[2]))
+                    ),
+                )
+            )
+            localZList.extend(
+                (
+                    list(each[0]),
+                    list(
+                        np.array(each[0])
+                        + np.array(each[3]) / float(np.linalg.norm(each[3]))
+                    ),
+                )
+            )
         vertices = np.array(localXList)
         elesMesh = [[2, int(2 * i1), int(2 * i1 + 1)] for i1 in range(int(0.5 * len(vertices)))]
         elesFaces = np.hstack(elesMesh)
@@ -822,7 +895,7 @@ class pyvistaPlotClass():
         periodDict={int(each['tags']):eval(each['contents']) for each in getPeriods}
         returnPeriod=periodDict[modelNum][0]
         periodLineEdit.setText(str('%.6f'%(returnPeriod)))
-        getModes=sqliteDBInstance.getModes(modalNameList[0]+'_'+str(modelNum))
+        getModes = sqliteDBInstance.getModes(f'{modalNameList[0]}_{modelNum}')
         modesDict={each['tags']:eval(each['contents']) for each in getModes}
         nodesReturnList = []
         for nodeName in nodeNameList:
@@ -859,7 +932,7 @@ class pyvistaPlotClass():
         periodDict = {int(each['tags']): eval(each['contents']) for each in getPeriods}
         returnPeriod = periodDict[modelNum][0]
         periodLineEdit.setText(str('%.6f' % (returnPeriod)))
-        getModes = sqliteDBInstance.getModes(modalNameList[0] + '_' + str(modelNum))
+        getModes = sqliteDBInstance.getModes(f'{modalNameList[0]}_{modelNum}')
         modesDict = {each['tags']: eval(each['contents']) for each in getModes}
         nodesReturnList = []
         for nodeName in nodeNameList:
@@ -888,7 +961,7 @@ class pyvistaPlotClass():
                               line_width=self.modeDynamicLineWidth)
         modeCoordsValue = [[modesDict[each['tags']][0] * scaleValue,modesDict[each['tags']][1] * scaleValue,
                         modesDict[each['tags']][2] * scaleValue, ] for each in nodesReturnList]
-        for modeIter in range(self.modeIterNum):
+        for _ in range(self.modeIterNum):
             [[self.plotter.update_coordinates(np.array([[vertices[j][0]+modeCoordsValue[j][0]*float(stepCount+1)/float(self.stepNum),
             vertices[j][1]+modeCoordsValue[j][1]*float(stepCount+1)/float(self.stepNum),
             vertices[j][2]+modeCoordsValue[j][2]*float(stepCount+1)/float(self.stepNum)] for j in range(len(vertices))]),
@@ -1277,7 +1350,7 @@ class TimeHistoryPlotClass(QtWidgets.QMainWindow):
         dbInstance = SqliteDB(self.dbPath)
         self.plotSetting()
         self.ax.set_xlabel('time (s)', font='Times New Roman', fontsize=18)
-        self.ax.set_ylabel('node-' + resType, font='Times New Roman', fontsize=15)
+        self.ax.set_ylabel(f'node-{resType}', font='Times New Roman', fontsize=15)
         for eachNode in nodeTagList:
             timesList, resList = dbInstance.getNodeTimeHistory(eachNode, resType, nodeDOF)
             self.ax.plot(timesList, resList, linewidth=0.8)
@@ -1292,7 +1365,7 @@ class TimeHistoryPlotClass(QtWidgets.QMainWindow):
         dbInstance = SqliteDB(self.dbPath)
         self.plotSetting()
         self.ax.set_xlabel('time (s)', font='Times New Roman', fontsize=18)
-        self.ax.set_ylabel('trussEle-' + resType, font='Times New Roman', fontsize=15)
+        self.ax.set_ylabel(f'trussEle-{resType}', font='Times New Roman', fontsize=15)
         for eachTrussEle in trussEleTagList:
             timesList, resList = dbInstance.getTrussEleResponseTimeHistory(eachTrussEle,resType)
             self.ax.plot(timesList, resList, linewidth=0.8)
@@ -1308,7 +1381,7 @@ class TimeHistoryPlotClass(QtWidgets.QMainWindow):
         dbInstance = SqliteDB(self.dbPath)
         self.plotSetting()
         self.ax.set_xlabel('time (s)', font='Times New Roman', fontsize=18)
-        self.ax.set_ylabel('zeroEle-' + resType, font='Times New Roman', fontsize=15)
+        self.ax.set_ylabel(f'zeroEle-{resType}', font='Times New Roman', fontsize=15)
         for eachEle in zeroEleTagList:
             timesList, resList = dbInstance.getZeroEleResponseTimeHistory(eachEle,resType,eleDOF)
             self.ax.plot(timesList, resList, linewidth=0.8)
@@ -1324,7 +1397,9 @@ class TimeHistoryPlotClass(QtWidgets.QMainWindow):
         dbInstance = SqliteDB(self.dbPath)
         self.plotSetting()
         self.ax.set_xlabel('time (s)', font='Times New Roman', fontsize=18)
-        self.ax.set_ylabel('nonEleSect-' + resType, font='Times New Roman', fontsize=15)
+        self.ax.set_ylabel(
+            f'nonEleSect-{resType}', font='Times New Roman', fontsize=15
+        )
         for eachEle in nonEleSectTagList:
             timesList, resList = dbInstance.getNonEleSectResponseTimeHistory(eachEle,resType,eleDOF)
             self.ax.plot(timesList, resList, linewidth=0.8)
@@ -1341,7 +1416,9 @@ class TimeHistoryPlotClass(QtWidgets.QMainWindow):
         dbInstance = SqliteDB(self.dbPath)
         self.plotSetting()
         self.ax.set_xlabel('time (s)', font='Times New Roman', fontsize=18)
-        self.ax.set_ylabel('nonZeroEle-' + resType, font='Times New Roman', fontsize=15)
+        self.ax.set_ylabel(
+            f'nonZeroEle-{resType}', font='Times New Roman', fontsize=15
+        )
         for eachEle in nonZeroEleTagList:
             timesList, resList = dbInstance.getNonZeroEleResponseTimeHistory(eachEle,resType,End,eleDOF)
             self.ax.plot(timesList, resList, linewidth=0.8)
